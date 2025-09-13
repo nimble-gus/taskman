@@ -27,10 +27,10 @@ TaskMan es una aplicación web desarrollada con JSF/PrimeFaces que permite admin
 - **JDK**: 11 o superior
 - **Maven**: 3.6 o superior
 - **Servidor de Aplicaciones**: 
-  - Jetty 11+ (recomendado para desarrollo)
+  - WildFly 26+ (recomendado)
   - Tomcat 10+
-  - WildFly 26+
   - Payara 6+
+  - Jetty 11+ (para desarrollo)
 
 ### Dependencias Principales
 - JSF 2.3.17
@@ -52,12 +52,20 @@ cd taskman
 mvn clean compile
 ```
 
-### 3. Ejecutar con Jetty (Desarrollo)
+### 3. Ejecutar con WildFly (Desarrollo)
 ```bash
-mvn jetty:run
+# Generar el WAR
+mvn clean package
+
+# Desplegar en WildFly (asumiendo que WildFly está en C:\wildfly)
+# Copiar el WAR a la carpeta deployments
+copy target\taskman-1.0.0.war C:\wildfly\standalone\deployments\
+
+# Iniciar WildFly
+C:\wildfly\bin\standalone.bat
 ```
 
-La aplicación estará disponible en: `http://localhost:8080/taskman`
+La aplicación estará disponible en: `http://localhost:8080/taskman-1.0.0/`
 
 ### 4. Generar WAR para Producción
 ```bash
@@ -145,12 +153,28 @@ Editar `web.xml` para cambiar el tema de PrimeFaces:
 </context-param>
 ```
 
+### Configuración de WildFly
+Para configurar WildFly correctamente:
+
+1. **Descargar WildFly 26+** desde [wildfly.org](https://www.wildfly.org/downloads/)
+2. **Configurar JAVA_HOME** apuntando a Java 11
+3. **Desplegar la aplicación**:
+   ```bash
+   # Copiar WAR a deployments
+   copy target\taskman-1.0.0.war %WILDFLY_HOME%\standalone\deployments\
+   
+   # Iniciar WildFly
+   %WILDFLY_HOME%\bin\standalone.bat
+   ```
+4. **Acceder a la consola de administración**: `http://localhost:9990/console`
+
 ### Configuración de Base de Datos
 Para migrar a base de datos real, reemplazar los repositorios en memoria con implementaciones JPA:
 1. Agregar dependencias JPA al `pom.xml`
 2. Crear entidades JPA
 3. Implementar repositorios con EntityManager
 4. Configurar `persistence.xml`
+5. Configurar datasource en WildFly
 
 ### Personalización de Validadores
 Los validadores personalizados se encuentran en `com.taskman.validation`:
@@ -191,6 +215,14 @@ Si las actualizaciones AJAX no funcionan:
 1. Verificar que jQuery está cargado
 2. Confirmar que los IDs de componentes son únicos
 3. Revisar la configuración de `update` en comandos AJAX
+
+### Problemas de WildFly
+Si la aplicación no se despliega en WildFly:
+1. Verificar que WildFly 26+ está instalado
+2. Confirmar que Java 11 está configurado como JAVA_HOME
+3. Revisar logs en `%WILDFLY_HOME%\standalone\log\server.log`
+4. Verificar que el WAR se copió correctamente a `deployments/`
+5. Comprobar que no hay conflictos de puertos (8080, 9990)
 
 ## 📝 Criterios de Evaluación Implementados
 
