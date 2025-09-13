@@ -240,8 +240,8 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 👨‍💻 Autor
 
 **Gustavo Ortiz**
-- GitHub: [@gustavo-ortiz](https://github.com/gustavo-ortiz)
-- Email: gustavo.ortiz@example.com
+- GitHub: [@nimblegus](https://github.com/gustavo-ortiz)
+- Email: gus@oktae.tech
 
 ## 🙏 Agradecimientos
 
