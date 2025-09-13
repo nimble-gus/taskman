@@ -24,20 +24,20 @@ TaskMan es una aplicación web desarrollada con JSF/PrimeFaces que permite admin
 ## 📋 Requisitos del Sistema
 
 ### Versiones Requeridas
-- **JDK**: 11 o superior
+- **JDK**: 17 o superior
 - **Maven**: 3.6 o superior
 - **Servidor de Aplicaciones**: 
-  - WildFly 26+ (recomendado)
+  - WildFly 36+ (recomendado)
   - Tomcat 10+
   - Payara 6+
   - Jetty 11+ (para desarrollo)
 
 ### Dependencias Principales
-- JSF 2.3.17
-- PrimeFaces 12.0.0
-- Weld CDI 3.1.9.Final
-- Jakarta EE 9.1.0
-- Hibernate Validator 7.0.5.Final
+- JSF 4.0.0
+- PrimeFaces 13.0.0
+- Weld CDI 5.1.2.Final
+- Jakarta EE 10.0.0
+- Hibernate Validator 8.0.1.Final
 
 ## 🛠️ Instalación y Configuración
 
@@ -273,7 +273,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 **Gustavo Ortiz**
 - GitHub: [@nimblegus](https://github.com/gustavo-ortiz)
-- Email: gus@oktae.tech
+- Email: gus@oktae.techn cuenta qu
 
 ## 🙏 Agradecimientos
 
