@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Dashboard</ui:define>
+    
+    <ui:define name="content">
+        <h:form id="dashboardForm">
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <p:panel header="Estadísticas Generales" styleClass="stats-panel">
+                    <div class="stats-content">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fa fa-folder"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>#{projectController.projectCount}</h3>
+                                <p>Proyectos Totales</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fa fa-list"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>#{taskController.totalTaskCount}</h3>
+                                <p>Tareas Totales</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fa fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>#{taskController.completedTaskCount}</h3>
+                                <p>Tareas Completadas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>#{taskController.openTaskCount}</h3>
+                                <p>Tareas Pendientes</p>
+                            </div>
+                        </div>
+                    </div>
+                </p:panel>
+            </div>
+
+            <!-- Recent Projects -->
+            <div class="dashboard-section">
+                <p:panel header="Proyectos Recientes" styleClass="dashboard-panel">
+                    <p:dataTable value="#{projectController.projects}" 
+                                var="project" 
+                                paginator="true" 
+                                rows="5"
+                                styleClass="dashboard-table">
+                        <p:column headerText="Nombre">
+                            <h:outputText value="#{project.name}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Propietario">
+                            <h:outputText value="#{project.owner}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Estado">
+                            <h:outputText value="#{project.status.displayName}" 
+                                        styleClass="status-badge status-#{project.status.name().toLowerCase().replace('_', '-')}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Fecha Creación">
+                            <h:outputText value="#{project.createdAt}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Acciones">
+                            <p:button value="Ver Tareas" 
+                                     icon="fa fa-list" 
+                                     outcome="/pages/projects.xhtml"
+                                     styleClass="ui-button ui-button-info ui-button-sm">
+                                <f:param name="projectId" value="#{project.id}"/>
+                            </p:button>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-section">
+                <p:panel header="Acciones Rápidas" styleClass="dashboard-panel">
+                    <div class="quick-actions">
+                        <p:button value="Nuevo Proyecto" 
+                                 icon="fa fa-plus" 
+                                 outcome="/pages/projects.xhtml"
+                                 styleClass="ui-button ui-button-success quick-action-btn"/>
+                        
+                        <p:button value="Ver Todos los Proyectos" 
+                                 icon="fa fa-folder" 
+                                 outcome="/pages/projects.xhtml"
+                                 styleClass="ui-button ui-button-info quick-action-btn"/>
+                    </div>
+                </p:panel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

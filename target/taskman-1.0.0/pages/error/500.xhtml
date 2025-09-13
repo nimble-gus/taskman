@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Error del Servidor - TaskMan</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <!-- PrimeFaces CSS -->
+    <h:outputStylesheet name="primefaces/primefaces.css"/>
+    <h:outputStylesheet name="primefaces/themes/nova-light/theme.css"/>
+    <h:outputStylesheet name="primefaces/primefaces-12.0.0.css"/>
+    
+    <!-- Custom CSS -->
+    <h:outputStylesheet name="css/custom.css"/>
+    
+    <!-- Font Awesome -->
+    <h:outputStylesheet name="font-awesome/css/font-awesome.min.css"/>
+</h:head>
+
+<h:body>
+    <div class="error-container">
+        <div class="error-content">
+            <div class="error-icon">
+                <i class="fa fa-exclamation-circle"></i>
+            </div>
+            <h1>500 - Error del Servidor</h1>
+            <p>Ha ocurrido un error interno del servidor. Por favor, intente nuevamente más tarde.</p>
+            <div class="error-actions">
+                <p:button value="Ir al Inicio" 
+                         icon="fa fa-home" 
+                         outcome="/index.xhtml"
+                         styleClass="ui-button ui-button-success"/>
+                
+                <p:button value="Dashboard" 
+                         icon="fa fa-dashboard" 
+                         outcome="/pages/dashboard.xhtml"
+                         styleClass="ui-button ui-button-info"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <h:outputScript name="js/jquery/jquery.js"/>
+    <h:outputScript name="js/primefaces/primefaces.js"/>
+</h:body>
+</html>

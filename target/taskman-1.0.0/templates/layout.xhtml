@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>#{title} - TaskMan</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <!-- PrimeFaces CSS -->
+    <h:outputStylesheet name="primefaces/primefaces.css"/>
+    <h:outputStylesheet name="primefaces/themes/nova-light/theme.css"/>
+    <h:outputStylesheet name="primefaces/primefaces-12.0.0.css"/>
+    
+    <!-- Custom CSS -->
+    <h:outputStylesheet name="css/custom.css"/>
+    
+    <!-- Font Awesome -->
+    <h:outputStylesheet name="font-awesome/css/font-awesome.min.css"/>
+</h:head>
+
+<h:body>
+    <!-- Global Messages -->
+    <p:growl id="growl" showDetail="true" sticky="false" life="3000"/>
+    
+    <!-- Layout Container -->
+    <div class="layout-container">
+        <!-- Header -->
+        <div class="layout-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa fa-tasks"></i>
+                    <span>TaskMan</span>
+                </div>
+                <div class="header-title">
+                    <h1>#{title}</h1>
+                </div>
+                <div class="header-stats">
+                    <p:outputPanel rendered="#{projectController != null}">
+                        <span class="stat-item">
+                            <i class="fa fa-folder"></i>
+                            #{projectController.projectCount} Proyectos
+                        </span>
+                    </p:outputPanel>
+                    <p:outputPanel rendered="#{taskController != null and taskController.currentProject != null}">
+                        <span class="stat-item">
+                            <i class="fa fa-list"></i>
+                            #{taskController.openTaskCount} Abiertas / #{taskController.completedTaskCount} Completadas
+                        </span>
+                    </p:outputPanel>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="layout-nav">
+            <p:menu model="#{navigationController.model}" styleClass="nav-menu"/>
+        </div>
+
+        <!-- Main Content -->
+        <div class="layout-content">
+            <ui:insert name="content">
+                <p>Contenido por defecto</p>
+            </ui:insert>
+        </div>
+
+        <!-- Footer -->
+        <div class="layout-footer">
+            <p>&copy; 2024 TaskMan - Sistema de Gestión de Proyectos y Tareas</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <h:outputScript name="js/jquery/jquery.js"/>
+    <h:outputScript name="js/primefaces/primefaces.js"/>
+    <h:outputScript name="js/custom.js"/>
+</h:body>
+</html>

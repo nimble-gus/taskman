@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition>
+    <h:form id="tasksForm">
+        <!-- Task Statistics -->
+        <div class="task-stats">
+            <div class="stat-item">
+                <i class="fa fa-list"></i>
+                <span>Total: #{taskController.totalTaskCount}</span>
+            </div>
+            <div class="stat-item">
+                <i class="fa fa-clock-o"></i>
+                <span>Abiertas: #{taskController.openTaskCount}</span>
+            </div>
+            <div class="stat-item">
+                <i class="fa fa-check-circle"></i>
+                <span>Completadas: #{taskController.completedTaskCount}</span>
+            </div>
+        </div>
+
+        <!-- Task Filters -->
+        <div class="filter-panel">
+            <p:panelGrid columns="4" styleClass="filter-grid">
+                <h:outputLabel value="Prioridad:" for="priorityFilter"/>
+                <p:selectOneMenu id="priorityFilter" 
+                                value="#{taskController.priorityFilter}" 
+                                style="width: 100%">
+                    <f:selectItem itemLabel="Todas las prioridades" itemValue="#{null}"/>
+                    <f:selectItems value="#{taskController.taskPriorities}" 
+                                  var="priority" 
+                                  itemLabel="#{priority.displayName}" 
+                                  itemValue="#{priority}"/>
+                    <p:ajax event="change" 
+                           listener="#{taskController.filterTasks()}" 
+                           update="tasksTable"/>
+                </p:selectOneMenu>
+                
+                <h:outputLabel value="Estado:" for="doneFilter"/>
+                <p:selectOneMenu id="doneFilter" 
+                                value="#{taskController.doneFilter}" 
+                                style="width: 100%">
+                    <f:selectItem itemLabel="Todas las tareas" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="Pendientes" itemValue="false"/>
+                    <f:selectItem itemLabel="Completadas" itemValue="true"/>
+                    <p:ajax event="change" 
+                           listener="#{taskController.filterTasks()}" 
+                           update="tasksTable"/>
+                </p:selectOneMenu>
+            </p:panelGrid>
+            
+            <div style="margin-top: 1rem; text-align: right;">
+                <p:commandButton value="Limpiar Filtros" 
+                                icon="fa fa-eraser" 
+                                action="#{taskController.clearFilters()}" 
+                                update="tasksTable"
+                                styleClass="ui-button ui-button-secondary"/>
+            </div>
+        </div>
+
+        <!-- Tasks Table -->
+        <p:dataTable id="tasksTable" 
+                    value="#{taskController.tasks}" 
+                    var="task" 
+                    paginator="true" 
+                    rows="10"
+                    styleClass="tasks-table"
+                    emptyMessage="No se encontraron tareas para este proyecto"
+                    rowStyleClass="#{taskController.getRowStyleClass(task)}">
+            
+            <p:column headerText="Título" sortBy="#{task.title}">
+                <h:outputText value="#{task.title}" 
+                            style="text-decoration: #{task.done ? 'line-through' : 'none'}; 
+                                   color: #{task.done ? '#6c757d' : 'inherit'};"/>
+            </p:column>
+            
+            <p:column headerText="Prioridad" sortBy="#{task.priority}">
+                <h:outputText value="#{task.priority.displayName}" 
+                            styleClass="priority-badge priority-#{task.priority.name().toLowerCase()}"/>
+            </p:column>
+            
+            <p:column headerText="Fecha Vencimiento" sortBy="#{task.dueDate}">
+                <h:outputText value="#{task.dueDate}">
+                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+                <i class="fa fa-exclamation-triangle" 
+                   style="color: #dc3545; margin-left: 5px;"
+                   rendered="#{taskController.isTaskOverdue(task)}"
+                   title="Tarea vencida"/>
+            </p:column>
+            
+            <p:column headerText="Estado" sortBy="#{task.done}">
+                <h:outputText value="#{task.done ? 'Completada' : 'Pendiente'}" 
+                            styleClass="status-badge #{task.done ? 'status-done' : 'status-active'}"/>
+            </p:column>
+            
+            <p:column headerText="Notas">
+                <h:outputText value="#{task.notes}" 
+                            rendered="#{task.notes != null and task.notes.length() > 0}"/>
+                <h:outputText value="Sin notas" 
+                            style="color: #6c757d; font-style: italic;"
+                            rendered="#{task.notes == null or task.notes.length() == 0}"/>
+            </p:column>
+            
+            <p:column headerText="Acciones" style="width: 200px;">
+                <p:commandButton value="#{task.done ? 'Reabrir' : 'Completar'}" 
+                                icon="#{task.done ? 'fa fa-undo' : 'fa fa-check'}" 
+                                action="#{taskController.toggleTaskCompletion(task)}" 
+                                update="tasksTable, :tasksForm:taskStats"
+                                styleClass="ui-button #{task.done ? 'ui-button-warning' : 'ui-button-success'} ui-button-sm"/>
+                
+                <p:commandButton value="Editar" 
+                                icon="fa fa-edit" 
+                                action="#{taskController.initEditTask(task)}" 
+                                update=":tasksForm:taskDialog"
+                                styleClass="ui-button ui-button-info ui-button-sm"/>
+                
+                <p:commandButton value="Eliminar" 
+                                icon="fa fa-trash" 
+                                action="#{taskController.deleteTask(task)}" 
+                                update="tasksTable, :tasksForm:taskStats, growl"
+                                styleClass="ui-button ui-button-danger ui-button-sm"
+                                onclick="return confirm('¿Está seguro de que desea eliminar esta tarea?')"/>
+            </p:column>
+        </p:dataTable>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 1rem; text-align: right;">
+            <p:commandButton value="Nueva Tarea" 
+                            icon="fa fa-plus" 
+                            action="#{taskController.initNewTask()}" 
+                            update=":tasksForm:taskDialog"
+                            styleClass="ui-button ui-button-success"/>
+        </div>
+
+        <!-- Task Dialog -->
+        <p:dialog id="taskDialog" 
+                 header="#{taskController.editMode ? 'Editar Tarea' : 'Nueva Tarea'}" 
+                 widgetVar="taskDialogWidget" 
+                 modal="true" 
+                 resizable="false" 
+                 draggable="false"
+                 visible="#{taskController.showDialog}"
+                 onShow="taskDialogWidget.show()"
+                 onHide="taskDialogWidget.hide()">
+            
+            <h:panelGrid columns="2" styleClass="task-form-grid">
+                <h:outputLabel value="Título *:" for="taskTitle"/>
+                <p:inputText id="taskTitle" 
+                            value="#{taskController.newTask.title}" 
+                            required="true" 
+                            requiredMessage="El título es obligatorio"
+                            style="width: 100%"/>
+                
+                <h:outputLabel value="Prioridad:" for="taskPriority"/>
+                <p:selectOneMenu id="taskPriority" 
+                                value="#{taskController.newTask.priority}" 
+                                style="width: 100%">
+                    <f:selectItems value="#{taskController.taskPriorities}" 
+                                  var="priority" 
+                                  itemLabel="#{priority.displayName}" 
+                                  itemValue="#{priority}"/>
+                </p:selectOneMenu>
+                
+                <h:outputLabel value="Fecha Vencimiento:" for="taskDueDate"/>
+                <p:calendar id="taskDueDate" 
+                           value="#{taskController.newTask.dueDate}" 
+                           pattern="dd/MM/yyyy"
+                           style="width: 100%">
+                    <f:validator validatorId="futureDateValidator"/>
+                </p:calendar>
+                
+                <h:outputLabel value="Completada:" for="taskDone"/>
+                <p:selectBooleanCheckbox id="taskDone" 
+                                        value="#{taskController.newTask.done}"/>
+                
+                <h:outputLabel value="Notas:" for="taskNotes"/>
+                <p:inputTextarea id="taskNotes" 
+                                value="#{taskController.newTask.notes}" 
+                                rows="3" 
+                                style="width: 100%"/>
+            </h:panelGrid>
+            
+            <p:messages id="taskMessages" showDetail="true"/>
+            
+            <f:facet name="footer">
+                <p:commandButton value="#{taskController.editMode ? 'Actualizar' : 'Crear'}" 
+                                icon="#{taskController.editMode ? 'fa fa-save' : 'fa fa-plus'}" 
+                                action="#{taskController.saveTask()}" 
+                                update="tasksTable, :tasksForm:taskStats, growl, taskMessages"
+                                oncomplete="if(!args.validationFailed) taskDialogWidget.hide()"
+                                styleClass="ui-button ui-button-success"/>
+                
+                <p:commandButton value="Cancelar" 
+                                icon="fa fa-times" 
+                                action="#{taskController.closeDialog()}" 
+                                update=":tasksForm:taskDialog"
+                                styleClass="ui-button ui-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+</ui:composition>
+</html>

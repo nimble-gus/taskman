@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>TaskMan - Sistema de Gestión de Proyectos y Tareas</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <!-- PrimeFaces CSS -->
+    <h:outputStylesheet name="primefaces/primefaces.css"/>
+    <h:outputStylesheet name="primefaces/themes/nova-light/theme.css"/>
+    <h:outputStylesheet name="primefaces/primefaces-12.0.0.css"/>
+    
+    <!-- Custom CSS -->
+    <h:outputStylesheet name="css/custom.css"/>
+    
+    <!-- Font Awesome -->
+    <h:outputStylesheet name="font-awesome/css/font-awesome.min.css"/>
+</h:head>
+
+<h:body>
+    <div class="welcome-container">
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <i class="fa fa-tasks welcome-icon"></i>
+                <h1>Bienvenido a TaskMan</h1>
+                <p>Sistema de Gestión de Proyectos y Tareas</p>
+            </div>
+            
+            <div class="welcome-actions">
+                <p:button value="Ir a Dashboard" 
+                         icon="fa fa-dashboard" 
+                         outcome="/pages/dashboard.xhtml"
+                         styleClass="ui-button ui-button-success welcome-btn"/>
+                
+                <p:button value="Gestionar Proyectos" 
+                         icon="fa fa-folder" 
+                         outcome="/pages/projects.xhtml"
+                         styleClass="ui-button ui-button-info welcome-btn"/>
+            </div>
+            
+            <div class="welcome-features">
+                <div class="feature-item">
+                    <i class="fa fa-folder-open"></i>
+                    <h3>Gestión de Proyectos</h3>
+                    <p>Crea, edita y administra tus proyectos con diferentes estados</p>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fa fa-list-check"></i>
+                    <h3>Gestión de Tareas</h3>
+                    <p>Organiza tareas por prioridad y fecha de vencimiento</p>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fa fa-chart-bar"></i>
+                    <h3>Seguimiento</h3>
+                    <p>Monitorea el progreso de tus proyectos y tareas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <h:outputScript name="js/jquery/jquery.js"/>
+    <h:outputScript name="js/primefaces/primefaces.js"/>
+</h:body>
+</html>

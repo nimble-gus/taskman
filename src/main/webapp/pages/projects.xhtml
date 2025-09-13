@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Gestión de Proyectos</ui:define>
+    
+    <ui:define name="content">
+        <h:form id="projectsForm">
+            <!-- Global Messages -->
+            <p:growl id="growl" showDetail="true" sticky="false" life="3000"/>
+            
+            <!-- Filter Panel -->
+            <div class="filter-panel">
+                <p:panelGrid columns="4" styleClass="filter-grid">
+                    <h:outputLabel value="Buscar:" for="searchInput"/>
+                    <p:inputText id="searchInput" 
+                                value="#{projectController.searchTerm}" 
+                                placeholder="Nombre o propietario del proyecto"
+                                style="width: 100%">
+                        <p:ajax event="keyup" 
+                               listener="#{projectController.search()}" 
+                               update="projectsTable"
+                               delay="300"/>
+                    </p:inputText>
+                    
+                    <h:outputLabel value="Estado:" for="statusFilter"/>
+                    <p:selectOneMenu id="statusFilter" 
+                                    value="#{projectController.statusFilter}" 
+                                    style="width: 100%">
+                        <f:selectItem itemLabel="Todos los estados" itemValue="#{null}"/>
+                        <f:selectItems value="#{projectController.projectStatuses}" 
+                                      var="status" 
+                                      itemLabel="#{status.displayName}" 
+                                      itemValue="#{status}"/>
+                        <p:ajax event="change" 
+                               listener="#{projectController.search()}" 
+                               update="projectsTable"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                
+                <div style="margin-top: 1rem; text-align: right;">
+                    <p:commandButton value="Limpiar Filtros" 
+                                    icon="fa fa-eraser" 
+                                    action="#{projectController.clearSearch()}" 
+                                    update="projectsTable"
+                                    styleClass="ui-button ui-button-secondary"/>
+                </div>
+            </div>
+
+            <!-- Projects Table -->
+            <p:dataTable id="projectsTable" 
+                        value="#{projectController.projects}" 
+                        var="project" 
+                        paginator="true" 
+                        rows="10"
+                        styleClass="projects-table"
+                        emptyMessage="No se encontraron proyectos">
+                
+                <p:column headerText="Nombre" sortBy="#{project.name}">
+                    <h:outputText value="#{project.name}"/>
+                </p:column>
+                
+                <p:column headerText="Propietario" sortBy="#{project.owner}">
+                    <h:outputText value="#{project.owner}"/>
+                </p:column>
+                
+                <p:column headerText="Estado" sortBy="#{project.status}">
+                    <h:outputText value="#{project.status.displayName}" 
+                                styleClass="status-badge status-#{project.status.name().toLowerCase().replace('_', '-')}"/>
+                </p:column>
+                
+                <p:column headerText="Fecha Creación" sortBy="#{project.createdAt}">
+                    <h:outputText value="#{project.createdAt}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{project.description}" 
+                                rendered="#{project.description != null and project.description.length() > 0}"/>
+                    <h:outputText value="Sin descripción" 
+                                style="color: #6c757d; font-style: italic;"
+                                rendered="#{project.description == null or project.description.length() == 0}"/>
+                </p:column>
+                
+                <p:column headerText="Acciones" style="width: 200px;">
+                    <p:commandButton value="Ver Tareas" 
+                                    icon="fa fa-list" 
+                                    action="#{projectController.selectProject(project)}" 
+                                    update=":projectsForm:taskExpansion"
+                                    styleClass="ui-button ui-button-info ui-button-sm"
+                                    rendered="#{projectController.selectedProject == null or projectController.selectedProject.id != project.id}"/>
+                    
+                    <p:commandButton value="Ocultar Tareas" 
+                                    icon="fa fa-eye-slash" 
+                                    action="#{projectController.selectProject(null)}" 
+                                    update=":projectsForm:taskExpansion"
+                                    styleClass="ui-button ui-button-secondary ui-button-sm"
+                                    rendered="#{projectController.selectedProject != null and projectController.selectedProject.id == project.id}"/>
+                    
+                    <p:commandButton value="Editar" 
+                                    icon="fa fa-edit" 
+                                    action="#{projectController.initEditProject(project)}" 
+                                    update=":projectsForm:projectDialog"
+                                    styleClass="ui-button ui-button-warning ui-button-sm"/>
+                    
+                    <p:commandButton value="Eliminar" 
+                                    icon="fa fa-trash" 
+                                    action="#{projectController.deleteProject(project)}" 
+                                    update="projectsTable, growl"
+                                    styleClass="ui-button ui-button-danger ui-button-sm"
+                                    onclick="return confirm('¿Está seguro de que desea eliminar este proyecto?')"/>
+                </p:column>
+            </p:dataTable>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 1rem; text-align: right;">
+                <p:commandButton value="Nuevo Proyecto" 
+                                icon="fa fa-plus" 
+                                action="#{projectController.initNewProject()}" 
+                                update=":projectsForm:projectDialog"
+                                styleClass="ui-button ui-button-success"/>
+            </div>
+
+            <!-- Task Expansion Panel -->
+            <h:panelGroup id="taskExpansion" 
+                         rendered="#{projectController.selectedProject != null}">
+                <div class="task-expansion">
+                    <h3>
+                        <i class="fa fa-list"></i>
+                        Tareas del Proyecto: #{projectController.selectedProject.name}
+                    </h3>
+                    <ui:include src="/pages/fragments/tasks-by-project.xhtml"/>
+                </div>
+            </h:panelGroup>
+
+            <!-- Project Dialog -->
+            <p:dialog id="projectDialog" 
+                     header="#{projectController.editMode ? 'Editar Proyecto' : 'Nuevo Proyecto'}" 
+                     widgetVar="projectDialogWidget" 
+                     modal="true" 
+                     resizable="false" 
+                     draggable="false"
+                     visible="#{projectController.showDialog}"
+                     onShow="projectDialogWidget.show()"
+                     onHide="projectDialogWidget.hide()">
+                
+                <h:panelGrid columns="2" styleClass="project-form-grid">
+                    <h:outputLabel value="Nombre *:" for="projectName"/>
+                    <p:inputText id="projectName" 
+                                value="#{projectController.newProject.name}" 
+                                required="true" 
+                                requiredMessage="El nombre es obligatorio"
+                                style="width: 100%">
+                        <f:validator validatorId="uniqueProjectNameValidator"/>
+                        <f:attribute name="currentProjectId" value="#{projectController.newProject.id}"/>
+                    </p:inputText>
+                    
+                    <h:outputLabel value="Propietario *:" for="projectOwner"/>
+                    <p:inputText id="projectOwner" 
+                                value="#{projectController.newProject.owner}" 
+                                required="true" 
+                                requiredMessage="El propietario es obligatorio"
+                                style="width: 100%"/>
+                    
+                    <h:outputLabel value="Estado:" for="projectStatus"/>
+                    <p:selectOneMenu id="projectStatus" 
+                                    value="#{projectController.newProject.status}" 
+                                    style="width: 100%">
+                        <f:selectItems value="#{projectController.projectStatuses}" 
+                                      var="status" 
+                                      itemLabel="#{status.displayName}" 
+                                      itemValue="#{status}"/>
+                    </p:selectOneMenu>
+                    
+                    <h:outputLabel value="Descripción:" for="projectDescription"/>
+                    <p:inputTextarea id="projectDescription" 
+                                    value="#{projectController.newProject.description}" 
+                                    rows="3" 
+                                    style="width: 100%"/>
+                </h:panelGrid>
+                
+                <p:messages id="projectMessages" showDetail="true"/>
+                
+                <f:facet name="footer">
+                    <p:commandButton value="#{projectController.editMode ? 'Actualizar' : 'Crear'}" 
+                                    icon="#{projectController.editMode ? 'fa fa-save' : 'fa fa-plus'}" 
+                                    action="#{projectController.saveProject()}" 
+                                    update="projectsTable, growl, projectMessages"
+                                    oncomplete="if(!args.validationFailed) projectDialogWidget.hide()"
+                                    styleClass="ui-button ui-button-success"/>
+                    
+                    <p:commandButton value="Cancelar" 
+                                    icon="fa fa-times" 
+                                    action="#{projectController.closeDialog()}" 
+                                    update=":projectsForm:projectDialog"
+                                    styleClass="ui-button ui-button-secondary"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>
