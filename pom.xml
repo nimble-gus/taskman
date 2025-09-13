@@ -22,7 +22,7 @@
         <!-- JSF Version -->
         <jsf.version>4.0.0</jsf.version>
         <!-- PrimeFaces Version -->
-        <primefaces.version>13.0.0</primefaces.version>
+        <primefaces.version>15.0.0</primefaces.version>
         <!-- Weld CDI Version -->
         <weld.version>5.1.2.Final</weld.version>
         <!-- Jakarta EE Version -->
@@ -42,6 +42,20 @@
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>${primefaces.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet.jsp</groupId>
+                    <artifactId>jsp-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>jstl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- CDI API -->

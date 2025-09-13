@@ -34,7 +34,7 @@ TaskMan es una aplicación web desarrollada con JSF/PrimeFaces que permite admin
 
 ### Dependencias Principales
 - JSF 4.0.0
-- PrimeFaces 13.0.0
+- PrimeFaces 15.0.0
 - Weld CDI 5.1.2.Final
 - Jakarta EE 10.0.0
 - Hibernate Validator 8.0.1.Final
